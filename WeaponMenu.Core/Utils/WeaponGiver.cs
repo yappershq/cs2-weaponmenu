@@ -11,16 +11,28 @@ internal static class WeaponGiver
         if (!Weapons.All.TryGetValue(weaponKey, out var entry))
             return;
 
-        var controller = client.GetPlayerController();
-        var pawn       = controller?.GetPlayerPawn();
-        if (pawn is null)
+        if (!client.IsInGame)
             return;
 
-        var gearSlot = entry.Slot == 0 ? GearSlot.Rifle : GearSlot.Pistol;
-        var existing = pawn.GetWeaponBySlot(gearSlot);
-        if (existing is not null)
-            pawn.RemovePlayerItem(existing);
+        var controller = client.GetPlayerController();
+        if (controller is null || !controller.IsValid())
+            return;
 
-        pawn.GiveNamedItem(entry.GiveName);
+        var pawn = controller.GetPlayerPawn();
+        if (pawn is null || !pawn.IsValid() || !pawn.IsAlive)
+            return;
+
+        try
+        {
+            var gearSlot = entry.Slot == 0 ? GearSlot.Rifle : GearSlot.Pistol;
+            var existing = pawn.GetWeaponBySlot(gearSlot);
+            if (existing is not null && existing.IsValid())
+                pawn.RemovePlayerItem(existing);
+
+            pawn.GiveNamedItem(entry.GiveName);
+        }
+        catch
+        {
+        }
     }
 }

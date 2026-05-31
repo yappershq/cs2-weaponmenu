@@ -227,10 +227,16 @@ internal sealed class WeaponMenuModule : IModule
             var capturedKey = key;
             menu.AddItem(key, ctrl =>
             {
-                WeaponGiver.Give(ctrl.Client, capturedKey);
-                SaveWeaponCookie(ctrl.Client, capturedKey);
-                ctrl.Client.Print(HudPrintChannel.Chat,
-                    _bridge.LocalizeAndColor(ctrl.Client, "weaponmenu.weapon_given", capturedKey));
+                var c = ctrl.Client;
+                if (!c.IsInGame)
+                    return;
+                var cbPawn = c.GetPlayerController()?.GetPlayerPawn();
+                if (cbPawn is null || !cbPawn.IsAlive)
+                    return;
+                WeaponGiver.Give(c, capturedKey);
+                SaveWeaponCookie(c, capturedKey);
+                c.Print(HudPrintChannel.Chat,
+                    _bridge.LocalizeAndColor(c, "weaponmenu.weapon_given", capturedKey));
                 ctrl.Exit();
             });
         }
@@ -241,14 +247,17 @@ internal sealed class WeaponMenuModule : IModule
                 c => _bridge.LocalizeFor(c, "weaponmenu.menu.forget"),
                 ctrl =>
                 {
+                    var c = ctrl.Client;
+                    if (!c.IsInGame)
+                        return;
                     var cp = _bridge.ClientPreferences;
-                    if (cp is not null && cp.IsLoaded(ctrl.Client.SteamId))
+                    if (cp is not null && cp.IsLoaded(c.SteamId))
                     {
-                        cp.SetCookie(ctrl.Client.SteamId, "weaponmenu.primary",   string.Empty);
-                        cp.SetCookie(ctrl.Client.SteamId, "weaponmenu.secondary", string.Empty);
+                        cp.SetCookie(c.SteamId, "weaponmenu.primary",   string.Empty);
+                        cp.SetCookie(c.SteamId, "weaponmenu.secondary", string.Empty);
                     }
-                    ctrl.Client.Print(HudPrintChannel.Chat,
-                        _bridge.LocalizeAndColor(ctrl.Client, "weaponmenu.preference.cleared"));
+                    c.Print(HudPrintChannel.Chat,
+                        _bridge.LocalizeAndColor(c, "weaponmenu.preference.cleared"));
                     ctrl.Exit();
                 });
         }

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Sharp.Shared.Enums;
 using Sharp.Shared.HookParams;
 using WeaponMenu.Core.Configuration;
 using WeaponMenu.Core.Utils;
@@ -61,29 +62,34 @@ internal sealed class AutoGiveModule : IModule
         if (cp is null || !cp.IsLoaded(client.SteamId))
             return;
 
-        var primaryCookie = cp.GetCookie(client.SteamId, "weaponmenu.primary");
-        if (primaryCookie is not null)
-        {
-            var key = primaryCookie.GetString();
-            if (!string.IsNullOrEmpty(key) &&
-                Weapons.All.ContainsKey(key) &&
-                !IsBlacklisted(key))
-            {
-                WeaponGiver.Give(client, key);
-            }
-        }
+        var primaryKey   = cp.GetCookie(client.SteamId, "weaponmenu.primary")?.GetString();
+        var secondaryKey = cp.GetCookie(client.SteamId, "weaponmenu.secondary")?.GetString();
 
-        var secondaryCookie = cp.GetCookie(client.SteamId, "weaponmenu.secondary");
-        if (secondaryCookie is not null)
+        if (string.IsNullOrEmpty(primaryKey) && string.IsNullOrEmpty(secondaryKey))
+            return;
+
+        var steamId = client.SteamId;
+
+        _bridge.ModSharp.PushTimer(() =>
         {
-            var key = secondaryCookie.GetString();
-            if (!string.IsNullOrEmpty(key) &&
-                Weapons.All.ContainsKey(key) &&
-                !IsBlacklisted(key))
+            var c = _bridge.ClientManager.GetGameClient(steamId);
+            if (c is null || !c.IsInGame)
+                return;
+
+            if (!string.IsNullOrEmpty(primaryKey) &&
+                Weapons.All.ContainsKey(primaryKey) &&
+                !IsBlacklisted(primaryKey))
             {
-                WeaponGiver.Give(client, key);
+                WeaponGiver.Give(c, primaryKey);
             }
-        }
+
+            if (!string.IsNullOrEmpty(secondaryKey) &&
+                Weapons.All.ContainsKey(secondaryKey) &&
+                !IsBlacklisted(secondaryKey))
+            {
+                WeaponGiver.Give(c, secondaryKey);
+            }
+        }, 0.0001, GameTimerFlags.StopOnMapEnd);
     }
 
     private bool IsBlacklisted(string key)
