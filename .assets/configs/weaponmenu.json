@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "minRound": 3,
+  "countWarmup": false,
+  "permission": "",
+  "weaponCommands": true,
+  "blacklist": ["NEGEV"]
+}

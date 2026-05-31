@@ -1,0 +1,10 @@
+{
+  "weaponmenu.menu.title":     { "en-US": "Choose weapon" },
+  "weaponmenu.menu.primary":   { "en-US": "Primary weapons" },
+  "weaponmenu.menu.secondary": { "en-US": "Secondary weapons" },
+  "weaponmenu.round_locked":   { "en-US": " {{red}}Weapon menu available from round {0}." },
+  "weaponmenu.not_alive":      { "en-US": " {{red}}You must be alive." },
+  "weaponmenu.no_permission":  { "en-US": " {{red}}No permission." },
+  "weaponmenu.not_allowed":    { "en-US": " {{red}}This feature is not enabled for you." },
+  "weaponmenu.weapon_given":   { "en-US": " {{green}}Selected: {{lime}}{0}{{green}}." }
+}

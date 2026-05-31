@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="WeaponMenu.Core/WeaponMenu.Core.csproj" />
+  <Project Path="WeaponMenu.Shared/WeaponMenu.Shared.csproj" />
+</Solution>
