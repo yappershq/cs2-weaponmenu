@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Extensions.Logging;
 using Sharp.Modules.AdminManager.Shared;
+using Sharp.Modules.ClientPreferences.Shared;
 using Sharp.Modules.LocalizerManager.Shared;
 using Sharp.Modules.MenuManager.Shared;
 using Sharp.Shared;
@@ -31,9 +32,12 @@ internal sealed class InterfaceBridge
     internal IModSharp       ModSharp       { get; }
     internal ILoggerFactory  LoggerFactory  { get; }
 
-    internal ILocalizerManager? LocalizerManager { get; private set; }
-    internal IMenuManager?      MenuManager      { get; private set; }
-    internal IAdminManager?     AdminManager     { get; private set; }
+    internal ILocalizerManager? LocalizerManager  { get; private set; }
+    internal IMenuManager?      MenuManager       { get; private set; }
+    internal IAdminManager?     AdminManager      { get; private set; }
+    internal IClientPreference? ClientPreferences { get; private set; }
+
+    private IDisposable? _cpCallback;
 
     public IGameRules GameRules => ModSharp.GetGameRules();
 
@@ -80,6 +84,19 @@ internal sealed class InterfaceBridge
 
         MenuManager  ??= SharpModuleManager.GetOptionalSharpModuleInterface<IMenuManager>(IMenuManager.Identity)?.Instance;
         AdminManager ??= SharpModuleManager.GetOptionalSharpModuleInterface<IAdminManager>(IAdminManager.Identity)?.Instance;
+
+        ResolveClientPreferences();
+    }
+
+    internal void ResolveClientPreferences()
+    {
+        var iface = SharpModuleManager.GetOptionalSharpModuleInterface<IClientPreference>(IClientPreference.Identity);
+        if (iface?.Instance is { } cp)
+        {
+            ClientPreferences = cp;
+            _cpCallback?.Dispose();
+            _cpCallback = null;
+        }
     }
 
     internal string LocalizeFor(IGameClient client, string key, params object?[] args)

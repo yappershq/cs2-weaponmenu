@@ -121,6 +121,12 @@ public class WeaponMenuPlugin : IModSharpModule
         }
     }
 
+    public void OnLibraryConnected(string name)
+    {
+        if (name.Equals("ClientPreferences", System.StringComparison.Ordinal))
+            _bridge.ResolveClientPreferences();
+    }
+
     string IModSharpModule.DisplayName   => "WeaponMenu";
     string IModSharpModule.DisplayAuthor => "prefix (ported from asapverneri/CS2-Gunsmenu)";
 }

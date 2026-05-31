@@ -19,6 +19,9 @@ internal static class ModuleDependencyInjection
             services.AddSingleton<IModule>(sp => sp.GetRequiredService<RoundTrackerModule>());
 
             services.AddSingleton<IModule, WeaponMenuModule>();
+
+            services.AddSingleton<AutoGiveModule>();
+            services.AddSingleton<IModule>(sp => sp.GetRequiredService<AutoGiveModule>());
         }
     }
 }

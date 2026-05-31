@@ -11,7 +11,14 @@ internal sealed class RoundTrackerModule : IModule, IEventListener, IGameListene
 
     private int  _liveRound;
 
-    public int CurrentLiveRound => _liveRound;
+    public int  CurrentLiveRound => _liveRound;
+    public bool IsLive           => _liveRound >= _config.MinRound && !IsWarmup();
+
+    private bool IsWarmup()
+    {
+        try   { return _bridge.GameRules.IsWarmupPeriod; }
+        catch { return false; }
+    }
 
     int IEventListener.ListenerPriority => 0;
     int IEventListener.ListenerVersion  => IEventListener.ApiVersion;

@@ -26,6 +26,9 @@ internal sealed class WeaponMenuConfig
     [JsonPropertyName("blacklist")]
     public List<string> Blacklist { get; set; } = new() { "NEGEV" };
 
+    [JsonPropertyName("rememberLastChoice")]
+    public bool RememberLastChoice { get; set; } = true;
+
     public static WeaponMenuConfig Load(string sharpPath, ILogger logger)
     {
         var configPath = Path.Combine(sharpPath, "configs", "weaponmenu.json");
