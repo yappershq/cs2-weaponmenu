@@ -36,6 +36,7 @@ internal sealed class RoundTrackerModule : IModule, IEventListener, IGameListene
         _bridge.ModSharp.InstallGameListener(this);
         _bridge.EventManager.InstallEventListener(this);
         _bridge.EventManager.HookEvent("round_start");
+        _bridge.EventManager.HookEvent("announce_phase_end");
         return true;
     }
 
@@ -57,6 +58,14 @@ internal sealed class RoundTrackerModule : IModule, IEventListener, IGameListene
 
     void IEventListener.FireGameEvent(IGameEvent @event)
     {
+        if (@event.Name == "announce_phase_end")
+        {
+            // Halftime / overtime side swap: economy resets, so the
+            // early-round weapon restriction starts over as well.
+            _liveRound = 0;
+            return;
+        }
+
         if (@event.Name != "round_start")
             return;
 
