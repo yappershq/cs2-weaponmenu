@@ -6,6 +6,7 @@
   "weaponmenu.not_alive":      { "en-US": " {{red}}You must be alive." },
   "weaponmenu.no_permission":  { "en-US": " {{red}}No permission." },
   "weaponmenu.not_allowed":    { "en-US": " {{red}}This feature is not enabled for you." },
+  "weaponmenu.round_limit":    { "en-US": " {{red}}You already took your weapon this round (max {0})." },
   "weaponmenu.weapon_given":          { "en-US": " {{green}}Selected: {{lime}}{0}{{green}}." },
   "weaponmenu.menu.forget":           { "en-US": "Forget remembered weapons" },
   "weaponmenu.preference.cleared":    { "en-US": " {{lime}}Cleared remembered weapons." }

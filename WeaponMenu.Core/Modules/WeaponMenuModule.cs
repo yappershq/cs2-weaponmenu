@@ -26,6 +26,10 @@ internal sealed class WeaponMenuModule : IModule
 
     private readonly List<(string cmd, IClientManager.DelegateClientCommand cb)> _weaponCallbacks = new();
 
+    // Per-round give budget: last live-round a slot took a weapon + how many it took that round.
+    private readonly int[] _givenRound = new int[64];
+    private readonly int[] _givenCount = new int[64];
+
     public WeaponMenuModule(
         InterfaceBridge           bridge,
         WeaponMenuConfig          config,
@@ -140,11 +144,45 @@ internal sealed class WeaponMenuModule : IModule
         if (!CheckGates(client))
             return ECommandAction.Handled;
 
+        if (!TryConsumeGive(client))
+            return ECommandAction.Handled;
+
         WeaponGiver.Give(client, weaponKey);
         SaveWeaponCookie(client, weaponKey);
         client.Print(HudPrintChannel.Chat,
             _bridge.LocalizeAndColor(client, "weaponmenu.weapon_given", weaponKey));
         return ECommandAction.Handled;
+    }
+
+    /// <summary>
+    /// Enforce the per-round weapon budget (config MaxPerRound; default 1 = one weapon/round).
+    /// Resets automatically when the live round number changes. 0 or less = unlimited.
+    /// </summary>
+    private bool TryConsumeGive(IGameClient client)
+    {
+        if (_config.MaxPerRound <= 0)
+            return true;
+
+        var slot = (int) (byte) client.Slot;
+        if ((uint) slot >= 64)
+            return true;
+
+        var round = _tracker.CurrentLiveRound;
+        if (_givenRound[slot] != round)
+        {
+            _givenRound[slot] = round;
+            _givenCount[slot] = 0;
+        }
+
+        if (_givenCount[slot] >= _config.MaxPerRound)
+        {
+            client.Print(HudPrintChannel.Chat,
+                _bridge.LocalizeAndColor(client, "weaponmenu.round_limit", _config.MaxPerRound));
+            return false;
+        }
+
+        _givenCount[slot]++;
+        return true;
     }
 
     private void SaveWeaponCookie(IGameClient client, string weaponKey)

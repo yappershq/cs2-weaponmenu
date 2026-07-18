@@ -29,6 +29,10 @@ internal sealed class WeaponMenuConfig
     [JsonPropertyName("rememberLastChoice")]
     public bool RememberLastChoice { get; set; } = true;
 
+    /// <summary>Max weapons a player may take per round (1 = one weapon per round). 0 or less = unlimited.</summary>
+    [JsonPropertyName("maxPerRound")]
+    public int MaxPerRound { get; set; } = 1;
+
     public static WeaponMenuConfig Load(string sharpPath, ILogger logger)
     {
         var configPath = Path.Combine(sharpPath, "configs", "weaponmenu.json");
